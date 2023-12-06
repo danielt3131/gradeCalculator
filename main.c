@@ -42,28 +42,25 @@ int main(int argc, char *argv[]) {
     char *readBuffer = (char *) malloc(gradeStringSize * sizeof(char));
     // Read in the grade weights with the associated string
     for (int i = 0; i < numberOfCategories; i++){
-        fscanf(gradeWeight, "%50s %lf%%\n", readBuffer, &gradeWgt[i]);
+        fscanf(gradeWeight, "%50s %lf%%\n", readBuffer, &gradeWgt[i]); // &gradeWgt[i] -> (gradeWgt + i)
         strcpy(gradeWgtStr[i], readBuffer);
         gradeWgt[i] = gradeWgt[i] / 100; // Put back to decimal / undo percent
     }
     int readCounter = 0;
     // Read until end of the gradeBook file
     while (!feof(gradeBook)){
-        fgets(readBuffer, 50, gradeBook);
-        categorySizes[readCounter] = atoi(readBuffer);
+        fscanf(gradeBook, "%d\n", &categorySizes[readCounter]);
         grades[readCounter] = (double *) malloc(categorySizes[readCounter] * sizeof(double));
-        fgets(readBuffer, 50, gradeBook);
-        printf("%s\n", readBuffer);
-        strcpy(gradeBookStr[readCounter], readBuffer);
+        fgets(gradeBookStr[readCounter], 50, gradeBook);
         for (int i = 0; i < categorySizes[readCounter]; i++){
             fscanf(gradeBook, "%lf%%\n", &grades[readCounter][i]);
-            grades[readCounter][i] = grades[readCounter][i] / 100;
-            printf("%.2lf%% \n", grades[readCounter][i]);  // Undo percentage
+            grades[readCounter][i] = grades[readCounter][i] / 100;  // Undo percentage
+            //printf("%.2lf%% \n", grades[readCounter][i]);
         }
         readCounter++;
     }
-    fclose(gradeBook);
-    fclose(gradeWeight);
+    fclose(gradeBook);    // Close the grade book file
+    fclose(gradeWeight);  // Close the grade weight file
     removeLF(numberOfCategories, gradeWgtStr);
     removeLF(numberOfCategories, gradeBookStr);
     /*
@@ -71,10 +68,9 @@ int main(int argc, char *argv[]) {
      */
     for (int i = 0; i < numberOfCategories; i++){
         for (int j = 0; j < numberOfCategories; j++){
-            printf("%s | %s \n", gradeBookStr[i], gradeWgtStr[j]);
             if(strcmp(gradeBookStr[i], gradeWgtStr[j]) == 0){
+                // Calculates the weighted grade for the category
                 weightedGrade[i] = average(grades[i], categorySizes[i]) * gradeWgt[i];
-                printf("Hello\n");// Calculates the weighted grade for the category
             }
         }
     }
@@ -82,7 +78,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < numberOfCategories; i++){
         totalGrade += weightedGrade[i];
     }
-    totalGrade *= 100;
+    totalGrade *= 100; // For percentage format
 
     // Deallocating memory
     free(weightedGrade);
