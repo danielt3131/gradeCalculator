@@ -78,9 +78,8 @@ int main(int argc, char *argv[]) {
         totalGrade += weightedGrade[i];
     }
     totalGrade *= 100;
-    printf("%.4lf %%", totalGrade);
+
     // Deallocating memory
-    free(readBuffer);
     free(weightedGrade);
     free(gradeWgt);
     free(categorySizes);
@@ -92,6 +91,22 @@ int main(int argc, char *argv[]) {
     free(gradeWgtStr);
     free(gradeBookStr);
     free(grades);
+
+    printf("Your final grade will be %.4lf %%\n", totalGrade);
+    printf("Do you want the calculated total grade saved?  If so press 1 and the file will be saved as grade.txt\n");
+    printf("Otherwise press any key to quit the program\n");
+
+    fgets(readBuffer, 50, stdin);
+    if (strcmp(readBuffer, "1\n") == 0){
+        FILE *result = fopen("grade.txt", "a");
+        fprintf(result, "%.4lf%%\n", totalGrade);
+        fclose(result);
+        free(readBuffer);
+        return 0;
+    } else {
+        free(readBuffer);
+        return 0;
+    }
 }
 
 
