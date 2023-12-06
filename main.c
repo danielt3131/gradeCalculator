@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+const int gradeStringSize = 50;
 
 int main(int argc, char *argv[]) {
     FILE *gradeWeight = NULL;
@@ -19,4 +20,15 @@ int main(int argc, char *argv[]) {
      * categorySizes stores the number of entries for each category
      */
     int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
+    double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
+    char **gradeStr = (char **) malloc(numberOfCategories * sizeof(char *));
+    for (int i = 0; i < numberOfCategories; i++){
+        gradeStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
+    }
+    int readCounter = 0;
+    // Read until end of file
+    while (!feof(gradeBook)){
+        fscanf(gradeBook, "%d", (categorySizes + readCounter));
+        readCounter++;
+    }
 }
