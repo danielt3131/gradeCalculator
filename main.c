@@ -8,16 +8,21 @@ double average (double *grades, int numberOfGrades);
 void removeLF (int numberOfStrings, char **string);
 
 int main(int argc, char *argv[]) {
-    FILE *gradeWeight = fopen("gradeWeight.txt", "r");
-    FILE *gradeBook = fopen("gradeBook.txt", "r");
-/*    if (argc > 2){
+    FILE *gradeWeight = NULL;
+    FILE *gradeBook = NULL;
+    if (argc > 1){
+        if(strcmp(argv[1], "-h") == 0){
+            printf("gradeCalculator (Grade Weight) (Grade Book)\n");
+            return 0;
+        }
+    }
+    if (argc > 2){
         gradeWeight = fopen(argv[1], "r");
         gradeBook = fopen(argv[2], "r");
     } else {
         fprintf(stderr, "Unable to find files, pass in the file name as cli arguments in the order (grade weight) and grade book.\n");
         return 0;
     }
-*/
     int numberOfCategories;
     fscanf(gradeWeight, "%d", &numberOfCategories);
     /*
