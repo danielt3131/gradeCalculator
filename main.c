@@ -4,6 +4,8 @@
 
 const int gradeStringSize = 50;
 
+double average (double *grades, int numberOfGrades);
+
 int main(int argc, char *argv[]) {
     FILE *gradeWeight = NULL;
     FILE *gradeBook = NULL;
@@ -32,13 +34,41 @@ int main(int argc, char *argv[]) {
     // Read in the grade weights with the associated string
     for (int i = 0; i < numberOfCategories; i++){
         fscanf(gradeWeight, "%50s:%lf%%\n", (gradeWgtStr + i), (gradeWgt + i));
+        gradeWgt[i] = gradeWgt[i] / 100; // Put back to decimal / undo percent
     }
     int readCounter = 0;
-    // Read until end of fil
+    // Read until end of the gradeBook file
     while (!feof(gradeBook)){
         fscanf(gradeBook, "%d", (categorySizes + readCounter));
         grades[readCounter] = malloc(categorySizes[readCounter] * sizeof(double));
-        fscanf(gradeBook, "%50s", ())
+        fgets(gradeBookStr[readCounter], 50, gradeBook);
+        for (int i = 0; i < categorySizes[readCounter]; i++){
+            fscanf(gradeBook, "%lf%%", grades[readCounter][i]);
+            grades[readCounter][i] = grades[readCounter][i] / 100; // Undo percentage
+        }
         readCounter++;
     }
+    fclose(gradeBook);
+    fclose(gradeWeight);
+    /*
+     * Grade calculation
+     */
+    for (int i = 0; i < numberOfCategories; i++){
+        for (int j = 0; j < numberOfCategories; j++){
+            // Tests if the two categories are the same
+            if(strcmp(gradeBookStr[i], gradeWgtStr[j]) == 0){
+
+            }
+        }
+    }
+}
+
+
+double average (double *grades, int numberOfGrades){
+    double average = 0;
+    for (int i = 0; i < numberOfGrades; i++){
+        average += grades[i]
+    }
+    average = average / numberOfGrades; // Calculates the average
+    return average;
 }
