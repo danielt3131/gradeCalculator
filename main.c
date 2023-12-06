@@ -26,7 +26,8 @@ int main(int argc, char *argv[]) {
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
     char **gradeWgtStr = (char *) malloc (numberOfCategories * sizeof(char *));
     char **gradeBookStr = (char **) malloc(numberOfCategories * sizeof(char *));
-    double **grades = (double **) malloc(numberOfCategories * sizeof(double));
+    double **grades = (double **) malloc(numberOfCategories * sizeof(double *));
+    double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
     for (int i = 0; i < numberOfCategories; i++){
         gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
         gradeBookStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
     // Read until end of the gradeBook file
     while (!feof(gradeBook)){
         fscanf(gradeBook, "%d", (categorySizes + readCounter));
-        grades[readCounter] = malloc(categorySizes[readCounter] * sizeof(double));
+        grades[readCounter] = (double *)malloc(categorySizes[readCounter] * sizeof(double));
         fgets(gradeBookStr[readCounter], 50, gradeBook);
         for (int i = 0; i < categorySizes[readCounter]; i++){
             fscanf(gradeBook, "%lf%%", grades[readCounter][i]);
@@ -57,10 +58,17 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < numberOfCategories; j++){
             // Tests if the two categories are the same
             if(strcmp(gradeBookStr[i], gradeWgtStr[j]) == 0){
-
+                weightedGrade[i] = average(grades[i], numberOfCategories[i]) * gradeWgt[i];  // Calculates the weighted grade for the category
             }
         }
     }
+    double totalGrade = 0;
+    for (int i = 0; i < numberOfCategories; i++){
+        totalGrade += weightedGrade[i];
+    }
+    totalGrade *= 100;
+    printf("%.4lf %%", totalGrade);
+    // Deallocing memory
 }
 
 
