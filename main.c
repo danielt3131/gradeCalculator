@@ -5,6 +5,7 @@
 const int gradeStringSize = 50;
 
 double average (double *grades, int numberOfGrades);
+void removeLF (int numberOfStrings, char **string);
 
 int main(int argc, char *argv[]) {
     FILE *gradeWeight = NULL;
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
      */
     int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
-    char **gradeWgtStr = (char *) malloc (numberOfCategories * sizeof(char *));
+    char **gradeWgtStr = (char **) malloc (numberOfCategories * sizeof(char *));
     char **gradeBookStr = (char **) malloc(numberOfCategories * sizeof(char *));
     double **grades = (double **) malloc(numberOfCategories * sizeof(double *));
     double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
@@ -44,13 +45,16 @@ int main(int argc, char *argv[]) {
         grades[readCounter] = (double *)malloc(categorySizes[readCounter] * sizeof(double));
         fgets(gradeBookStr[readCounter], 50, gradeBook);
         for (int i = 0; i < categorySizes[readCounter]; i++){
-            fscanf(gradeBook, "%lf%%", grades[readCounter][i]);
-            grades[readCounter][i] = grades[readCounter][i] / 100; // Undo percentage
+            fscanf(gradeBook, "%lf%%", &grades[readCounter][i]);
+            grades[readCounter][i] = grades[readCounter][i] / 100;
+            printf("%.2lf %%", grades[readCounter][i]);  // Undo percentage
         }
         readCounter++;
     }
     fclose(gradeBook);
     fclose(gradeWeight);
+    removeLF(numberOfCategories, gradeWgtStr);
+    removeLF(numberOfCategories, gradeBookStr);
     /*
      * Grade calculation
      */
@@ -58,7 +62,8 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < numberOfCategories; j++){
             // Tests if the two categories are the same
             if(strcmp(gradeBookStr[i], gradeWgtStr[j]) == 0){
-                weightedGrade[i] = average(grades[i], numberOfCategories[i]) * gradeWgt[i];  // Calculates the weighted grade for the category
+                weightedGrade[i] = average(grades[i], categorySizes[i]) * gradeWgt[i];
+                printf("Hello");// Calculates the weighted grade for the category
             }
         }
     }
@@ -75,8 +80,17 @@ int main(int argc, char *argv[]) {
 double average (double *grades, int numberOfGrades){
     double average = 0;
     for (int i = 0; i < numberOfGrades; i++){
-        average += grades[i]
+        average += grades[i];
     }
     average = average / numberOfGrades; // Calculates the average
     return average;
+}
+void removeLF (int numberOfStrings, char **string){
+    for (int i = 0; i < numberOfStrings; i++){
+        for (int j = 0; j <= strlen(string[i]); j++){
+            if (string[i][j] == '\n'){
+                string[i][j] = '\0'; // Insert null byte
+            }
+        }
+    }
 }
