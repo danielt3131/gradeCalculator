@@ -80,6 +80,18 @@ int main(int argc, char *argv[]) {
     totalGrade *= 100;
     printf("%.4lf %%", totalGrade);
     // Deallocating memory
+    free(readBuffer);
+    free(weightedGrade);
+    free(gradeWgt);
+    free(categorySizes);
+    for (int i = 0; i < numberOfCategories; i++){
+        free(gradeWgtStr[i]);
+        free(gradeBookStr[i]);
+        free(grades[i]);
+    }
+    free(gradeWgtStr);
+    free(gradeBookStr);
+    free(grades);
 }
 
 
