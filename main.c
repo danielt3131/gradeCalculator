@@ -19,6 +19,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct grade{
+    char gradeCategory[50];
+    double *grades;
+    double gradeWeight;
+}grade;
+
 const int gradeStringSize = 50;
 
 double average (const double *grades, int numberOfGrades);
