@@ -51,21 +51,17 @@ int main(int argc, char *argv[]) {
     int numberOfCategories;
     // Reading in the number of categories -> example Homework, Exams, Attendance will be 3
     fscanf(gradeWeight, "%d", &numberOfCategories);
+    Grade *grade = (Grade *) malloc(numberOfCategories * sizeof(Grade));
     /*
      * Allocating memory for the arrays, to be dynamic
      */
     // Stores the number of grades per category
-    Grade *grade = (Grade *) malloc(numberOfCategories * sizeof(Grade));
-//    int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
     char **gradeWgtStr = (char **) malloc (numberOfCategories * sizeof(char *));
-//    char **gradeBookStr = (char **) malloc(numberOfCategories * sizeof(char *));
-//    double **grades = (double **) malloc(numberOfCategories * sizeof(double *));
     double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
     // 2D array allocation
     for (int i = 0; i < numberOfCategories; i++){
         gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
-//        gradeBookStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
     }
     char *readBuffer = (char *) malloc(gradeStringSize * sizeof(char));
     // Read in the grade weights with the associated string
