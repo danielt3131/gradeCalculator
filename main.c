@@ -28,26 +28,26 @@ typedef struct Grade{
 
 const int gradeStringSize = 50;
 
-double average (const double *grades, int numberOfGrades);
+double average (const double *grades, unsigned long numberOfGrades);
 void removeLF (char *string);
 
 int main(int argc, char *argv[]) {
-    FILE *gradeWeight = NULL;
-    FILE *gradeBook = NULL;
+    FILE *gradeWeight = fopen("gradeWeight.txt", "r");
+    FILE *gradeBook = fopen("gradeBook.txt", "r");
     if (argc > 1){
         if(strcmp(argv[1], "-h") == 0){
             printf("gradeCalculator (Grade Weight) (Grade Book)\n");
             return 0;
         }
     }
-    if (argc > 2){
+   /* if (argc > 2){
         gradeWeight = fopen(argv[1], "r");
         gradeBook = fopen(argv[2], "r");
     } else {
         // Prints to the standard error (still in the cli) and terminates the program
         fprintf(stderr, "Unable to find files, pass in the file name as cli arguments in the order (grade weight) and grade book.\n");
         return 0;
-    }
+    }*/
     int numberOfCategories;
     // Reading in the number of categories -> example Homework, Exams, Attendance will be 3
     fscanf(gradeWeight, "%d", &numberOfCategories);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
     // 2D array allocation
     for (int i = 0; i < numberOfCategories; i++){
-//        gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
+        gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
 //        gradeBookStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
     }
     char *readBuffer = (char *) malloc(gradeStringSize * sizeof(char));
@@ -100,8 +100,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < grade[readCounter].numberOfGrades; i++){
             fscanf(gradeBook, "%lf%%\n", &grade[readCounter].grades[i]);
             grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;  // Undo percentage |-> percent % = n * 100
-            weightedGrade[i] = average(grade[i].grades, grade[i].numberOfGrades) * grade[i].gradeWeight;
-            //printf("%.2lf%% \n", grades[readCounter][i]);  // <- Debug line
+            printf("%.2lf%% \n", grade[readCounter].grades[i]);  // <- Debug line
         }
         readCounter++;
     }
@@ -112,7 +111,7 @@ int main(int argc, char *argv[]) {
 
 
     for (int i = 0; i < numberOfCategories; i++){
-
+        weightedGrade[i] = average(grade[i].grades, grade[i].numberOfGrades) * grade[i].gradeWeight;
     }
     double totalGrade = 0;
     for (int i = 0; i < numberOfCategories; i++){
@@ -148,7 +147,7 @@ int main(int argc, char *argv[]) {
 }
 
 // const -> the values don't change
-double average (const double *grades, int numberOfGrades){
+double average (const double *grades, unsigned long numberOfGrades){
     double average = 0;
     for (int i = 0; i < numberOfGrades; i++){
         average += grades[i];  // Sum up the array
