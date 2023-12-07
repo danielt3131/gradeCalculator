@@ -107,8 +107,9 @@ int main(int argc, char *argv[]) {
     /*
      * Grade calculation
      */
-    for (int i = 0; i < numberOfCategories; i++){
+    for (int i = 0; i < numberOfCategories; i++) {
         weightedGrade[i] = average(grade[i].grades, grade[i].numberOfGrades) * grade[i].gradeWeight;
+        printf("Your average %s grade is %.4lf %%\n", grade[i].gradeCategory, (weightedGrade[i] / grade[i].gradeWeight) * 100);
     }
     double totalGrade = 0;
     for (int i = 0; i < numberOfCategories; i++){
@@ -125,7 +126,7 @@ int main(int argc, char *argv[]) {
     }
     free(gradeWgtStr);
     free(grade);
-
+    printf("\n");
     printf("Your final grade will be %.4lf %%\n", totalGrade);
     printf("Do you want the calculated total grade saved?  If so press 1 and the file will be saved as grade.txt\n");
     printf("Otherwise press any key to quit the program\n");
