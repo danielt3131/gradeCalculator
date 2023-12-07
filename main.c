@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         gradeBook = fopen(argv[2], "r");
     } else {
         // Prints to the standard error (still in the cli) and terminates the program
-        fprintf(stderr, "Unable to find files, pass in the file name as cli arguments in the order (grade weight) and grade book.\n");
+        fprintf(stderr, "Unable to find files, pass in the file name as cli arguments in the order grade weight and grade book.\n");
         return 0;
     }
     int numberOfCategories;
@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
     /*
      * Allocating memory for the arrays, to be dynamic
      */
-    // Stores the number of grades per category
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
     char **gradeWgtStr = (char **) malloc (numberOfCategories * sizeof(char *));
     double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
@@ -69,24 +68,26 @@ int main(int argc, char *argv[]) {
         //
         fscanf(gradeWeight, "%50s %lf%%\n", readBuffer, &gradeWgt[i]); // &gradeWgt[i] -> (gradeWgt + i)
         strcpy(gradeWgtStr[i], readBuffer);// Copies the string in the readBuffer to gradeWgtStr at i
-        removeLF(gradeWgtStr[i]);
+        removeLF(gradeWgtStr[i]); // Removes \n Linefeed (ASCII value 10) for strcmp
         gradeWgt[i] = gradeWgt[i] / 100; // Put back to decimal / undo percent
     }
-    fclose(gradeWeight);  // Close the grade weight file
+    fclose(gradeWeight);  // Close the grade weight file as it's no longer needed
     int readCounter = 0;
-    /*
-    * Removes \n from strings to ensure strcmp works correctly
-    */
 
     // Read until end of the gradeBook file
     while (!feof(gradeBook)){
+        // Stores the number of grades into the struct at index readCounter.
         fscanf(gradeBook, "%lu\n", &grade[readCounter].numberOfGrades);
         // Jagged array for the grade entries
         grade[readCounter].grades = (double *) malloc(grade[readCounter].numberOfGrades * sizeof(double));
         // Reading in the string for the grade category -> example Homework
         fgets(readBuffer, 50, gradeBook);
-        removeLF(readBuffer);
-        // Makes sure that the grade weight entries will goto the correct struct
+        removeLF(readBuffer); // Removes \n Linefeed (ASCII value 10) for strcmp
+        /*
+         * Makes sures that the grade weight will be set to the correct struct
+         * By comparing the grade category string from the grade book to all grade categories read in from gradeWeight
+         * If successful then the gradeWeight variable in the struct is set to the correct value
+         */
         for (int i = 0; i < numberOfCategories; i++){
             if(strcmp(readBuffer, gradeWgtStr[i]) == 0){
                 strcpy(grade[readCounter].gradeCategory, readBuffer);
@@ -111,8 +112,8 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < numberOfCategories; i++){
         totalGrade += weightedGrade[i];
     }
-
     totalGrade *= 100; // For percentage format
+
     // Deallocating memory |-> giving ownership back to the operating system to ensure no memory leaks.
     free(weightedGrade);
     free(gradeWgt);
