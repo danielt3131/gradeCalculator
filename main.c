@@ -46,6 +46,8 @@ int main(int argc, char *argv[]) {
     } else {
         // Prints to the standard error (still in the cli) and terminates the program
         fprintf(stderr, "Unable to find files, pass in the file name as cli arguments in the order grade weight and grade book.\n");
+        fprintf(stderr, "For more info about the cli arguments pass -h to see the help page\n");
+        fprintf(stderr, "Now exiting\n");
         return 0;
     }
     int numberOfCategories;
