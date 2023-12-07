@@ -19,11 +19,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct grade{
+typedef struct Grade{
     char gradeCategory[50];
     double *grades;
     double gradeWeight;
-}grade;
+}Grade;
 
 const int gradeStringSize = 50;
 
@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
      * Allocating memory for the arrays, to be dynamic
      */
     // Stores the number of grades per category
+    g
     int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
     char **gradeWgtStr = (char **) malloc (numberOfCategories * sizeof(char *));
