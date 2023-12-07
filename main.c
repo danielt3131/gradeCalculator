@@ -23,12 +23,13 @@ typedef struct Grade{
     char gradeCategory[50];
     double *grades;
     double gradeWeight;
+    unsigned long numberOfGrades;
 }Grade;
 
 const int gradeStringSize = 50;
 
 double average (const double *grades, int numberOfGrades);
-void removeLF (int numberOfStrings, char **string);
+void removeLF (char *string);
 
 int main(int argc, char *argv[]) {
     FILE *gradeWeight = NULL;
@@ -54,58 +55,64 @@ int main(int argc, char *argv[]) {
      * Allocating memory for the arrays, to be dynamic
      */
     // Stores the number of grades per category
-    g
-    int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
+    Grade *grade = (Grade *) malloc(numberOfCategories * sizeof(Grade));
+//    int *categorySizes = (int *) malloc(numberOfCategories * sizeof(int));
     double *gradeWgt = (double *) malloc(numberOfCategories * sizeof(double));
     char **gradeWgtStr = (char **) malloc (numberOfCategories * sizeof(char *));
-    char **gradeBookStr = (char **) malloc(numberOfCategories * sizeof(char *));
-    double **grades = (double **) malloc(numberOfCategories * sizeof(double *));
+//    char **gradeBookStr = (char **) malloc(numberOfCategories * sizeof(char *));
+//    double **grades = (double **) malloc(numberOfCategories * sizeof(double *));
     double *weightedGrade = (double *) malloc(numberOfCategories * sizeof(double));
     // 2D array allocation
     for (int i = 0; i < numberOfCategories; i++){
-        gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
-        gradeBookStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
+//        gradeWgtStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
+//        gradeBookStr[i] = (char *) malloc(gradeStringSize * sizeof(char));
     }
     char *readBuffer = (char *) malloc(gradeStringSize * sizeof(char));
     // Read in the grade weights with the associated string
     for (int i = 0; i < numberOfCategories; i++){
         //
         fscanf(gradeWeight, "%50s %lf%%\n", readBuffer, &gradeWgt[i]); // &gradeWgt[i] -> (gradeWgt + i)
-        strcpy(gradeWgtStr[i], readBuffer);  // Copies the string in the readBuffer to gradeWgtStr at i
+        strcpy(gradeWgtStr[i], readBuffer);// Copies the string in the readBuffer to gradeWgtStr at i
+        removeLF(gradeWgtStr[i]);
         gradeWgt[i] = gradeWgt[i] / 100; // Put back to decimal / undo percent
     }
+    fclose(gradeWeight);  // Close the grade weight file
     int readCounter = 0;
+    /*
+    * Removes \n from strings to ensure strcmp works correctly
+    */
+
     // Read until end of the gradeBook file
     while (!feof(gradeBook)){
-        fscanf(gradeBook, "%d\n", &categorySizes[readCounter]);
+        fscanf(gradeBook, "%lu\n", &grade[readCounter].numberOfGrades);
         // Jagged array for the grade entries
-        grades[readCounter] = (double *) malloc(categorySizes[readCounter] * sizeof(double));
+        grade[readCounter].grades = (double *) malloc(grade[readCounter].numberOfGrades * sizeof(double));
         // Reading in the string for the grade category -> example Homework
-        fgets(gradeBookStr[readCounter], 50, gradeBook);
-        for (int i = 0; i < categorySizes[readCounter]; i++){
-            fscanf(gradeBook, "%lf%%\n", &grades[readCounter][i]);
-            grades[readCounter][i] = grades[readCounter][i] / 100;  // Undo percentage |-> percent % = n * 100
+        fgets(readBuffer, 50, gradeBook);
+        removeLF(readBuffer);
+        // Makes sure that the grade weight entries will goto the correct struct
+        for (int i = 0; i < numberOfCategories; i++){
+            if(strcmp(readBuffer, gradeWgtStr[i]) == 0){
+                strcpy(grade[readCounter].gradeCategory, readBuffer);
+                grade[readCounter].gradeWeight = gradeWgt[i];
+            }
+        }
+        for (int i = 0; i < grade[readCounter].numberOfGrades; i++){
+            fscanf(gradeBook, "%lf%%\n", &grade[readCounter].grades[i]);
+            grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;  // Undo percentage |-> percent % = n * 100
+            weightedGrade[i] = average(grade[i].grades, grade[i].numberOfGrades) * grade[i].gradeWeight;
             //printf("%.2lf%% \n", grades[readCounter][i]);  // <- Debug line
         }
         readCounter++;
     }
     fclose(gradeBook);    // Close the grade book file
-    fclose(gradeWeight);  // Close the grade weight file
-    /*
-     * Removes \n from strings to ensure strcmp works correctly
-     */
-    removeLF(numberOfCategories, gradeWgtStr);
-    removeLF(numberOfCategories, gradeBookStr);
     /*
      * Grade calculation
      */
+
+
     for (int i = 0; i < numberOfCategories; i++){
-        for (int j = 0; j < numberOfCategories; j++){
-            if(strcmp(gradeBookStr[i], gradeWgtStr[j]) == 0){
-                // Calculates the weighted grade for the category
-                weightedGrade[i] = average(grades[i], categorySizes[i]) * gradeWgt[j];
-            }
-        }
+
     }
     double totalGrade = 0;
     for (int i = 0; i < numberOfCategories; i++){
@@ -116,15 +123,12 @@ int main(int argc, char *argv[]) {
     // Deallocating memory |-> giving ownership back to the operating system to ensure no memory leaks.
     free(weightedGrade);
     free(gradeWgt);
-    free(categorySizes);
     for (int i = 0; i < numberOfCategories; i++){
         free(gradeWgtStr[i]);
-        free(gradeBookStr[i]);
-        free(grades[i]);
+        free(grade[i].grades);
     }
     free(gradeWgtStr);
-    free(gradeBookStr);
-    free(grades);
+    free(grade);
 
     printf("Your final grade will be %.4lf %%\n", totalGrade);
     printf("Do you want the calculated total grade saved?  If so press 1 and the file will be saved as grade.txt\n");
@@ -152,13 +156,11 @@ double average (const double *grades, int numberOfGrades){
     average = average / numberOfGrades; // Calculates the average
     return average;
 }
-void removeLF (int numberOfStrings, char **string){
-    for (int i = 0; i < numberOfStrings; i++){
-        for (int j = 0; j <= strlen(string[i]); j++){
-            // If the character at [i][j] is equal to \n (ASCII value of 10)
-            if (string[i][j] == '\n'){
-                string[i][j] = '\0'; // Insert null byte (ASCII value of 0) to terminate the string
-            }
+void removeLF (char *string){
+    for (int j = 0; j <= strlen(string); j++){
+        // If the character at [i][j] is equal to \n (ASCII value of 10)
+        if (string[j] == '\n'){
+            string[j] = '\0'; // Insert null byte (ASCII value of 0) to terminate the string
         }
     }
 }
