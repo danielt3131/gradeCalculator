@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct Grade{
     char gradeCategory[50];
@@ -75,7 +76,18 @@ int main(int argc, char *argv[]) {
     }
     fclose(gradeWeight);  // Close the grade weight file as it's no longer needed
     int readCounter = 0;
-
+    // Mode selector bool -> % equals to percent format and / represents fraction format, default format is
+    char modeSelectorChar;
+    bool percentFormat;
+    fscanf(gradeBook, "%50s %c\n", readBuffer, &modeSelectorChar);
+    if (modeSelectorChar == '%' && strcmp(readBuffer, "Mode:") == 0){
+        percentFormat = true;
+    } else if (modeSelectorChar == '/' && strcmp(readBuffer, "Mode:") == 0){
+        percentFormat = false;
+    } else {
+        fseek(gradeBook, 0, SEEK_SET); // Goto start of file for the upcoming fscanf
+        percentFormat = true;
+    }
     // Read until end of the gradeBook file
     while (!feof(gradeBook)){
         // Stores the number of grades into the struct at index readCounter.
@@ -97,8 +109,14 @@ int main(int argc, char *argv[]) {
             }
         }
         for (int i = 0; i < grade[readCounter].numberOfGrades; i++){
-            fscanf(gradeBook, "%lf%%\n", &grade[readCounter].grades[i]);
-            grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;  // Undo percentage |-> percent % = n * 100
+            if (percentFormat == true){
+                fscanf(gradeBook, "%lf%%\n", &grade[readCounter].grades[i]);
+                grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;  // Undo percentage |-> percent % = n * 100
+            } else {
+                double numerator = 0;
+                fscanf(gradeBook,"%lf/%lf\n", &numerator, &grade[readCounter].grades[i]);
+                grade[readCounter].grades[i] = numerator / grade[readCounter].grades[i];
+            }
             //printf("%.2lf%% \n", grade[readCounter].grades[i]);  // <- Debug line
         }
         readCounter++;
