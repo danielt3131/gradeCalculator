@@ -74,21 +74,20 @@ int main(int argc, char *argv[]) {
         removeLF(gradeWgtStr[i]); // Removes \n Linefeed (ASCII value 10) for strcmp
         gradeWgt[i] = gradeWgt[i] / 100; // Put back to decimal / undo percent
     }
-    fclose(gradeWeight);  // Close the grade weight file as it's no longer needed
+    fclose(gradeWeight);  // Close the Grade Weight file as it's no longer needed
     int readCounter = 0;
-    // Mode selector bool -> % equals to percent format and / represents fraction format, default format is
     char modeSelectorChar;
-    bool percentFormat;
+    bool percentFormat;    // True = percent format, false = fractional format
     fscanf(gradeBook, "%50s %c\n", readBuffer, &modeSelectorChar);
     if (modeSelectorChar == '%' && strcmp(readBuffer, "Mode:") == 0){
         percentFormat = true;
     } else if (modeSelectorChar == '/' && strcmp(readBuffer, "Mode:") == 0){
         percentFormat = false;
     } else {
-        fseek(gradeBook, 0, SEEK_SET); // Goto start of file for the upcoming fscanf
-        percentFormat = true;
+        fseek(gradeBook, 0, SEEK_SET); // Goto the start of the Grade Book file for the upcoming fscanf
+        percentFormat = true;  // Default format is percentage.
     }
-    // Read until end of the gradeBook file
+    // Read until end of the Grade Book file
     while (!feof(gradeBook)){
         // Stores the number of grades into the struct at index readCounter.
         fscanf(gradeBook, "%lu\n", &grade[readCounter].numberOfGrades);
@@ -111,13 +110,18 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < grade[readCounter].numberOfGrades; i++){
             if (percentFormat == true){
                 fscanf(gradeBook, "%lf%%\n", &grade[readCounter].grades[i]);
-                grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;  // Undo percentage |-> percent % = n * 100
+                // Undo percentage |-> percent % = n * 100
+                grade[readCounter].grades[i] = grade[readCounter].grades[i] / 100;
             } else {
                 double numerator = 0;
+                // Store the numerator to the variable numerator and the denominator to grade[readCounter].grades[i]
                 fscanf(gradeBook,"%lf/%lf\n", &numerator, &grade[readCounter].grades[i]);
+                /*
+                 * Get the decimal representation by dividing the numerator by the denominator.
+                 * Store the result back into grade[readCounter].grades[i].
+                 */
                 grade[readCounter].grades[i] = numerator / grade[readCounter].grades[i];
             }
-            //printf("%.2lf%% \n", grade[readCounter].grades[i]);  // <- Debug line
         }
         readCounter++;
     }
@@ -127,13 +131,14 @@ int main(int argc, char *argv[]) {
      */
     for (int i = 0; i < numberOfCategories; i++) {
         weightedGrade[i] = average(grade[i].grades, grade[i].numberOfGrades) * grade[i].gradeWeight;
+        // weightedGrade[i] / grade[i] removes the grade weight & multiplying by 100 converts the grade to percent format
         printf("Your average %s grade is %.4lf %%\n", grade[i].gradeCategory, (weightedGrade[i] / grade[i].gradeWeight) * 100);
     }
     double totalGrade = 0;
     for (int i = 0; i < numberOfCategories; i++){
-        totalGrade += weightedGrade[i];
+        totalGrade += weightedGrade[i];  // Sum up all of the weightedGrades as totalGrade
     }
-    totalGrade *= 100; // For percentage format
+    totalGrade *= 100; // To covert to percentage format
 
     // Deallocating memory |-> giving ownership back to the operating system to ensure no memory leaks.
     free(weightedGrade);
